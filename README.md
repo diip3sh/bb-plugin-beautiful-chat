@@ -24,7 +24,7 @@ No BeautifulUI source code is bundled — only its visual language is applied.
 ## Install
 
 ```sh
-bb plugin install https://github.com/landerdevelopers/bb-plugin-beautiful-chat
+bb plugin install https://github.com/diip3sh/bb-plugin-beautiful-chat
 ```
 
 Local development, from the plugin directory:

@@ -36,11 +36,11 @@
   "author": "Diip3sh <pilladipesh.pd@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/landerdevelopers/bb-plugin-beautiful-chat.git"
+    "url": "git+https://github.com/diip3sh/bb-plugin-beautiful-chat.git"
   },
-  "homepage": "https://github.com/landerdevelopers/bb-plugin-beautiful-chat#readme",
+  "homepage": "https://github.com/diip3sh/bb-plugin-beautiful-chat#readme",
   "bugs": {
-    "url": "https://github.com/landerdevelopers/bb-plugin-beautiful-chat/issues"
+    "url": "https://github.com/diip3sh/bb-plugin-beautiful-chat/issues"
   },
   "keywords": [
     "bb-plugin",
