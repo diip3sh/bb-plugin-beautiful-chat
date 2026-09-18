@@ -15,11 +15,13 @@ No BeautifulUI source code is bundled — only its visual language is applied.
 
 ## Screenshots
 
-<!-- TODO: add screenshots.
-     - Chat with default settings (composer, work rows, tool chips)
-     - A pending row with each loader variant
-     - An approval card and the merged banner stack
-     Place files in assets/ and link them here. -->
+A running thread: user bubble, the dots loader, tree lines on the live tool group, and the prompt minimized while the response generates.
+
+![Beautiful Chat in a running thread](assets/screenshots/beautiful-chat-1.png)
+
+Every part can be switched off on its own:
+
+![Beautiful Chat settings](assets/screenshots/beautiful-chat-2.png)
 
 ## Install
 
