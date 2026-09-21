@@ -98,6 +98,79 @@
   box-shadow: none;
 }
 
+/* Phone: BB collapses [data-follow-up-composer-footer] (max-height: 0, opacity: 0)
+   and hides full picker labels. Un-hiding opacity without restoring height used to
+   paint empty chips under the keyboard; targeting [data-promptbox-shell] > div
+   also unpacks the composer anchor. Grid only the footer (and the new-thread
+   sibling), keep full labels, and fuse it onto the prompt as one card. */
+@media (max-width: 640px) {
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer-anchor] {
+    display: block;
+    height: auto;
+    min-height: 0;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer] {
+    display: flex;
+    flex-direction: column;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer] [data-promptbox-layout] {
+    height: auto !important;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer] form[data-promptbox] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: none;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer-footer],
+  :root:not([data-bui-off~="prompt"]) [data-app-composer]:not(:has([data-follow-up-composer])) > div:has(> div [data-promptbox-project-control]) {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    position: relative !important;
+    max-height: unset !important;
+    min-height: 0 !important;
+    margin-top: 0 !important;
+    padding: 8px;
+    overflow: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    border: 1px solid var(--bui-line);
+    border-top-width: 0;
+    border-bottom-left-radius: var(--bui-radius-window);
+    border-bottom-right-radius: var(--bui-radius-window);
+    background-color: var(--bui-surface);
+    box-shadow: var(--bui-shadow-soft);
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer-footer] > div,
+  :root:not([data-bui-off~="prompt"]) [data-app-composer]:not(:has([data-follow-up-composer])) > div:has(> div [data-promptbox-project-control]) > div {
+    display: contents;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer-footer] [data-promptbox-full-label],
+  :root:not([data-bui-off~="prompt"]) [data-app-composer]:not(:has([data-follow-up-composer])) > div:has(> div [data-promptbox-project-control]) [data-promptbox-full-label] {
+    display: block !important;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer-footer] [data-promptbox-compact-label],
+  :root:not([data-bui-off~="prompt"]) [data-app-composer]:not(:has([data-follow-up-composer])) > div:has(> div [data-promptbox-project-control]) [data-promptbox-compact-label] {
+    display: none !important;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-follow-up-composer-footer] button,
+  :root:not([data-bui-off~="prompt"]) [data-app-composer]:not(:has([data-follow-up-composer])) > div:has(> div [data-promptbox-project-control]) button {
+    width: 100%;
+    min-width: 0;
+    height: 28px;
+    justify-content: flex-start;
+    padding-inline: 8px;
+    overflow: hidden;
+    border-radius: var(--bui-radius-control);
+    background-color: var(--bui-field);
+    color: var(--bui-ink-2);
+    font-size: 12px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* ── User messages (userBubbles): soft filled bubbles, no border ─────────────── */
 :root:not([data-bui-off~="bubbles"]) [data-timeline-row-id*=":user-seed:"] .group\/message > div > .rounded-xl,
 :root:not([data-bui-off~="bubbles"]) [data-timeline-row-id*=":user:"] .group\/message > div > .rounded-xl {
@@ -116,9 +189,64 @@
   font-size: 11.5px;
   padding: 1px 5px;
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] pre {
+/* BB wraps fenced blocks in a card with a wrap/copy header. Keep that chrome:
+   one hairline card, a 32px toolbar (language + chips), then the code flush
+   underneath — not a second rounded pre nested inside the wrapper. */
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) {
+  --bui-code-header: 32px;
+  overflow: hidden;
+  border-color: transparent;
   border-radius: var(--bui-radius-card);
+  background-color: var(--bui-inset);
   box-shadow: 0 0 0 1px var(--bui-line);
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child {
+  align-items: center;
+  height: var(--bui-code-header);
+  min-height: var(--bui-code-header);
+  padding: 0 6px 0 12px;
+  border-bottom: 1px solid var(--bui-line);
+  background-color: var(--bui-surface);
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child > span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--bui-ink-3);
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child > span:empty::before {
+  content: "Code";
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: var(--bui-radius-chip);
+  color: var(--bui-ink-2);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 150ms var(--bui-ease-out);
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button:active {
+  transform: scale(0.94);
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button[aria-pressed="true"] {
+  background-color: var(--bui-hover);
+  color: var(--bui-ink);
+}
+@media (hover: hover) and (pointer: fine) {
+  :root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button:hover {
+    background-color: var(--bui-hover);
+    color: var(--bui-ink);
+  }
+}
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] pre {
+  margin: 0;
+  padding: 10px 12px 12px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* ── Message actions (messageActions): hover chips; spatial tooltips live in JS ─ */
@@ -161,6 +289,40 @@
 :root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > .grid > .overflow-hidden > div {
   transition-duration: 300ms;
   transition-timing-function: var(--bui-ease-out);
+}
+/* Keyboard focus: BB's 3px near-white outline reads as a selection box; show the
+   pill's hover fill with a firmer hairline instead, still clearly visible. */
+:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > button:focus-visible {
+  outline: none;
+  background-color: var(--bui-hover);
+  box-shadow: 0 0 0 1px var(--bui-line-strong);
+}
+/* Log details (Provisioned thread and other op rows): here the details panel is a
+   sibling of the row group. Instead of BB's bordered terminal box, the log reads as
+   child rows under the header, like an expanded work group: guide line, no card,
+   the work rows' sans type and 22px rhythm. */
+/* Only log panels (a bordered box holding a <pre>): work groups share this sibling
+   layout but already draw their own tree lines, and a second guide line doubles them. */
+:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row + .grid > .overflow-hidden > div:has(> .rounded-lg.border pre) {
+  margin-left: 14px;
+  padding-left: 12px;
+  padding-right: 0;
+  border-left: 1px solid var(--bui-line);
+}
+:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row + .grid > .overflow-hidden > div > .rounded-lg.border {
+  border-color: transparent;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row + .grid > .overflow-hidden > div > .rounded-lg.border pre {
+  padding: 0 0 2px;
+  /* BB dims op rows to 40%; keep the log lines from outshining their header. */
+  color: color-mix(in oklch, var(--bui-ink-3) 70%, transparent);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 22px;
+  opacity: 1;
 }
 :root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > button .tabular-nums {
   font-family: ui-monospace, "SF Mono", monospace;
@@ -695,7 +857,8 @@ ul)>li+li:before {
   [data-promptbox] [data-promptbox-submit-action]:not(:disabled):active,
   [data-promptbox-action-row] button:not([data-promptbox-submit-action]):active,
   [data-radix-popper-content-wrapper] > [role="dialog"]:has(> div > button > svg[data-icon="MessageSquarePlus"]) button:active,
-  section[data-testid$="-banner"] button.inline-flex.whitespace-nowrap:not(:disabled):active {
+  section[data-testid$="-banner"] button.inline-flex.whitespace-nowrap:not(:disabled):active,
+  [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button:active {
     transform: none;
   }
   [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
