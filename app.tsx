@@ -7,6 +7,7 @@ import { definePluginApp, useSettings } from "@get-bb/plugin-sdk/app";
 import { rootAttributes } from "./settings";
 import { registerCoinsWorklet } from "./coins-worklet";
 import { mountSpatialTooltips } from "./spatial-tooltip";
+import { mountPhaseSync } from "./phase-sync";
 
 const ROOT_ATTRIBUTES = ["data-bui-loader", "data-bui-chips", "data-bui-off"];
 
@@ -24,6 +25,8 @@ function BeautifulChatStyles() {
     root.setAttribute("data-bui-off", offList);
     return () => ROOT_ATTRIBUTES.forEach((name) => root.removeAttribute(name));
   }, [isLoading, loader, chips, offList]);
+
+  useEffect(() => mountPhaseSync(), []);
 
   const tooltips = !off.includes("actions");
   useEffect(() => (tooltips ? mountSpatialTooltips() : undefined), [tooltips]);

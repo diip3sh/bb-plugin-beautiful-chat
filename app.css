@@ -290,10 +290,21 @@
 }
 
 /* ── Shimmer (shimmer): brighter, faster band on pending labels ─────────────── */
+/* BB used to shine `.animate-shine` with a text-clipped gradient. It now uses an
+   APNG mask over the whole box plus `-webkit-text-fill-color`. A background
+   gradient on that mask paints a gray pill instead of a band through the
+   glyphs, so drop the mask and clip BeautifulUI's band to the text. */
 @media (prefers-reduced-motion: no-preference) {
   :root:not([data-bui-off~="shimmer"]) #thread-detail-timeline-panel .animate-shine {
+    -webkit-mask-image: none;
+    mask-image: none;
+    will-change: auto;
     background-image: linear-gradient(90deg, var(--bui-ink-3) 35%, var(--bui-ink) 50%, var(--bui-ink-3) 65%);
     background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     animation: bui-shimmer-text 1.4s linear infinite;
   }
 }
@@ -313,7 +324,7 @@
   border-radius: 1px;
   background-color: var(--bui-ink);
   transform: translateY(1px);
-  animation: bui-fade-in 150ms ease-out both;
+  /* No fade-in: the caret is recreated on every streamed chunk, so a fade would blink. */
 }
 
 /* ── Approval cards (approvalCard): permission requests and agent questions ──── */
