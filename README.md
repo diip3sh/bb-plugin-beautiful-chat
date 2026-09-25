@@ -92,12 +92,13 @@ bb plugin reload beautiful-chat
 ## Tests
 
 ```sh
-node --experimental-strip-types --test settings.test.ts spatial-tooltip.test.ts
+node --experimental-strip-types --test app-css.test.ts settings.test.ts spatial-tooltip.test.ts
 ```
 
-Five tests: `rootAttributes()` value validation and fallbacks, and `placeTip()`
-edge-flipping and viewport clamping. No test framework, no browser — both units
-are pure functions.
+Seven tests: the composer CSS source and bundled output preserve BB's native footer,
+`rootAttributes()` validates setting values and fallbacks, and `placeTip()` covers
+edge-flipping and viewport clamping. The CSS tests are static guards; visual
+behavior also needs browser verification against BB's current markup.
 
 ## Limitations
 
