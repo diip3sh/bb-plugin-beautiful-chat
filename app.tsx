@@ -8,12 +8,16 @@ import { rootAttributes } from "./settings";
 import { registerCoinsWorklet } from "./coins-worklet";
 import { mountSpatialTooltips } from "./spatial-tooltip";
 import { mountPhaseSync } from "./phase-sync";
+import { mountComposerTray } from "./composer-tray";
+import { mountModelPopoverFocus } from "./model-popover";
+import { mountPerfMarkers } from "./perf-markers";
+import { ChangedFiles } from "./changed-files";
 
-const ROOT_ATTRIBUTES = ["data-bui-loader", "data-bui-chips", "data-bui-off"];
+const ROOT_ATTRIBUTES = ["data-bui-loader", "data-bui-chips", "data-bui-composer", "data-bui-off"];
 
 function BeautifulChatStyles() {
   const { values, isLoading } = useSettings();
-  const { loader, chips, off } = rootAttributes(values ?? {});
+  const { loader, chips, composer, off } = rootAttributes(values ?? {});
   const offList = off.join(" ");
 
   useEffect(() => {
@@ -22,11 +26,20 @@ function BeautifulChatStyles() {
     const root = document.documentElement;
     root.setAttribute("data-bui-loader", loader);
     root.setAttribute("data-bui-chips", chips);
+    root.setAttribute("data-bui-composer", composer);
     root.setAttribute("data-bui-off", offList);
     return () => ROOT_ATTRIBUTES.forEach((name) => root.removeAttribute(name));
-  }, [isLoading, loader, chips, offList]);
+  }, [isLoading, loader, chips, composer, offList]);
 
   useEffect(() => mountPhaseSync(), []);
+  // Replace timeline `:has()` with data-* markers so thread switches stay cheap.
+  useEffect(() => mountPerfMarkers(), []);
+
+  const tray = composer === "tray";
+  useEffect(() => (tray ? mountComposerTray() : undefined), [tray]);
+
+  const promptBar = !off.includes("prompt");
+  useEffect(() => (promptBar ? mountModelPopoverFocus() : undefined), [promptBar]);
 
   const tooltips = !off.includes("actions");
   useEffect(() => (tooltips ? mountSpatialTooltips() : undefined), [tooltips]);
@@ -50,4 +63,9 @@ function BeautifulChatStyles() {
 
 export default definePluginApp((app) => {
   app.slots.experimental_appOverlay({ id: "beautiful-chat-styles", component: BeautifulChatStyles });
+  app.composer.customize({
+    id: "turn-changes",
+    scopes: ["thread"],
+    banners: [{ id: "changed-files", chrome: "bare", component: ChangedFiles }],
+  });
 });

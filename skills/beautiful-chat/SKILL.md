@@ -8,9 +8,9 @@ description: Beautiful Chat plugin — CSS restyle of BB's native chat (composer
 It changes how BB's native chat looks, not how it behaves. Every feature below
 has a setting (Settings → Plugins → Beautiful Chat, or
 `bb plugin config beautiful-chat`): `loader` (drive | dots | orbit | coins | bb),
-`toolChips` (surface | outline | plain), and on/off switches `shimmer`,
+`toolChips` (surface | outline | plain), `composer` (default | tray: a rounded follow-up card with the git/PR/background-command items in a tray fused onto its top), and on/off switches `shimmer`,
 `workRows`, `streamingCaret`, `approvalCard`, `promptBar`, `userBubbles`,
-`codeChips`, `selectionPill`, `messageActions`, `unreadMarker`, `mergedBanners`, `minimizeWhileRunning`, `treeLines`. Disable or remove it to revert
+`codeChips`, `selectionPill`, `messageActions`, `unreadMarker`, `mergedBanners`, `minimizeWhileRunning`, `treeLines`, `turnChanges`. Disable or remove it to revert
 everything: `bb plugin disable beautiful-chat` / `bb plugin remove beautiful-chat`.
 
 - Composer (`form[data-promptbox]`): 14px radius, hairline border that firms up on

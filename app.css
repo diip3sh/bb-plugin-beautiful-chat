@@ -98,10 +98,32 @@
   box-shadow: none;
 }
 
+/* Model popover: grows from the model button (Radix's transform origin) instead of
+   BB's generic fade-zoom. Enter 150ms from opacity 0 / scale 0.95 on the ease-out
+   curve; exit shorter and quieter, 120ms to scale 0.98. */
+@keyframes bui-pop-in { from { opacity: 0; transform: scale(0.95); } }
+@keyframes bui-pop-out { to { opacity: 0; transform: scale(0.98); } }
+:root:not([data-bui-off~="prompt"]) [data-radix-popper-content-wrapper] > [role="dialog"]:has([aria-label="Search models"]) {
+  transform-origin: var(--radix-popper-transform-origin);
+  will-change: transform, opacity;  /* first-frame smoothness only; it's in a portal, so it never moves layout */
+}
+:root:not([data-bui-off~="prompt"]) [data-radix-popper-content-wrapper] > [role="dialog"]:has([aria-label="Search models"])[data-state="open"] {
+  animation: bui-pop-in 150ms var(--bui-ease-out) both;
+}
+:root:not([data-bui-off~="prompt"]) [data-radix-popper-content-wrapper] > [role="dialog"]:has([aria-label="Search models"])[data-state="closed"] {
+  animation: bui-pop-out 120ms var(--bui-ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-bui-off~="prompt"]) [data-radix-popper-content-wrapper] > [role="dialog"]:has([aria-label="Search models"])[data-state="open"] {
+    animation: bui-fade-in 150ms ease both;
+  }
+  :root:not([data-bui-off~="prompt"]) [data-radix-popper-content-wrapper] > [role="dialog"]:has([aria-label="Search models"])[data-state="closed"] {
+    animation: bui-fade-in 120ms ease reverse both;
+  }
+}
 
 /* ── User messages (userBubbles): soft filled bubbles, no border ─────────────── */
-:root:not([data-bui-off~="bubbles"]) [data-timeline-row-id*=":user-seed:"] .group\/message > div > .rounded-xl,
-:root:not([data-bui-off~="bubbles"]) [data-timeline-row-id*=":user:"] .group\/message > div > .rounded-xl {
+:root:not([data-bui-off~="bubbles"]) [data-timeline-row-id*=":user-seed:"] .group\/message > div > .rounded-xl, :root:not([data-bui-off~="bubbles"]) [data-timeline-row-id*=":user:"] .group\/message > div > .rounded-xl {
   border-color: transparent;
   border-radius: 12px;
   background-color: var(--bui-field);
@@ -120,7 +142,7 @@
 /* BB wraps fenced blocks in a card with a wrap/copy header. Keep that chrome:
    one hairline card, a 32px toolbar (language + chips), then the code flush
    underneath — not a second rounded pre nested inside the wrapper. */
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] {
   --bui-code-header: 32px;
   overflow: hidden;
   border-color: transparent;
@@ -128,7 +150,7 @@
   background-color: var(--bui-inset);
   box-shadow: 0 0 0 1px var(--bui-line);
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child {
   align-items: center;
   height: var(--bui-code-header);
   min-height: var(--bui-code-header);
@@ -136,16 +158,16 @@
   border-bottom: 1px solid var(--bui-line);
   background-color: var(--bui-surface);
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child > span {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child > span {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: var(--bui-ink-3);
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child > span:empty::before {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child > span:empty::before {
   content: "Code";
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child button {
   width: 24px;
   height: 24px;
   min-width: 24px;
@@ -156,15 +178,15 @@
     color 150ms ease,
     transform 150ms var(--bui-ease-out);
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button:active {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child button:active {
   transform: scale(0.94);
 }
-:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button[aria-pressed="true"] {
+:root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child button[aria-pressed="true"] {
   background-color: var(--bui-hover);
   color: var(--bui-ink);
 }
 @media (hover: hover) and (pointer: fine) {
-  :root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button:hover {
+  :root:not([data-bui-off~="code"]) [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child button:hover {
     background-color: var(--bui-hover);
     color: var(--bui-ink);
   }
@@ -197,9 +219,7 @@
     background-color 150ms ease,
     color 150ms ease;
 }
-:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > button .text-sm,
-:root:not([data-bui-off~="rows"]) [data-timeline-row-list] [data-timeline-row-id] > .rounded-md > .text-sm,
-:root:not([data-bui-off~="rows"]) [data-timeline-row-list] [data-timeline-row-id] > .rounded-md > .text-sm .text-sm {
+:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > button .text-sm, :root:not([data-bui-off~="rows"]) [data-timeline-row-list] [data-timeline-row-id] > .rounded-md > .text-sm, :root:not([data-bui-off~="rows"]) [data-timeline-row-list] [data-timeline-row-id] > .rounded-md > .text-sm .text-sm {
   font-size: 12.5px;
 }
 @media (hover: hover) and (pointer: fine) {
@@ -213,8 +233,7 @@
   padding-left: 12px;
   border-left: 1px solid var(--bui-line);
 }
-:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > .grid,
-:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > .grid > .overflow-hidden > div {
+:root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > .grid, :root:not([data-bui-off~="rows"]) [data-timeline-row-list] .group\/timeline-row > .grid > .overflow-hidden > div {
   transition-duration: 300ms;
   transition-timing-function: var(--bui-ease-out);
 }
@@ -297,10 +316,14 @@
 @keyframes bui-orb-6 { 0%, 62%, 100% { --bui-orb-6: 0.15; } 18%, 42% { --bui-orb-6: 1; } }
 @keyframes bui-orb-7 { 0%, 62%, 100% { --bui-orb-7: 0.15; } 18%, 42% { --bui-orb-7: 1; } }
 
-:root:not([data-bui-loader="bb"]) [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child) > svg {
+/* An active child thread in the composer's context shows the same loader in place of
+   its person icon: it is work in progress, like a pending row. */
+:root:not([data-bui-loader="bb"]) [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending] > svg,
+:root:not([data-bui-loader="bb"]) section[aria-label="Child threads"] > div:first-child > button[aria-label*="active child thread" i] > svg:first-child {
   display: none;
 }
-:root:not([data-bui-loader="bb"]) [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
+:root:not([data-bui-loader="bb"]) [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before,
+:root:not([data-bui-loader="bb"]) section[aria-label="Child threads"] > div:first-child > button[aria-label*="active child thread" i]::before {
   --bui-px-on: var(--bui-ink);
   content: "";
   flex-shrink: 0;
@@ -308,9 +331,10 @@
   height: 14px;
 }
 /* Drive (default): square pixels sweep diagonally. */
-:root:not([data-bui-loader]) [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before,
-:root[data-bui-loader="drive"] [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before,
-:root[data-bui-loader="coins"]:not([data-bui-coins-ready]) [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
+:root:not([data-bui-loader]) [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before,
+/* Drive (default): square pixels sweep diagonally. */
+:root[data-bui-loader="drive"] [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before,
+:root[data-bui-loader="coins"]:not([data-bui-coins-ready]) [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before {
   background:
     linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-px-b) * 100%), transparent) 0 0) 0px 0px / 4px 4px no-repeat,
     linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-px-c) * 100%), transparent) 0 0) 5px 0px / 4px 4px no-repeat,
@@ -328,7 +352,8 @@
     bui-px-d 650ms ease-in-out 270ms infinite;
 }
 /* Dots: the same sweep with round pixels. */
-:root[data-bui-loader="dots"] [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
+/* Dots: the same sweep with round pixels. */
+:root[data-bui-loader="dots"] [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before {
   background:
     radial-gradient(closest-side, color-mix(in oklch, var(--bui-px-on) calc(var(--bui-px-b) * 100%), transparent) 90%, transparent) 0px 0px / 4px 4px no-repeat,
     radial-gradient(closest-side, color-mix(in oklch, var(--bui-px-on) calc(var(--bui-px-c) * 100%), transparent) 90%, transparent) 5px 0px / 4px 4px no-repeat,
@@ -346,7 +371,8 @@
     bui-px-d 650ms ease-in-out 270ms infinite;
 }
 /* Orbit: one lit pixel walks the edge; the centre stays dim. */
-:root[data-bui-loader="orbit"] [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
+/* Orbit: one lit pixel walks the edge; the centre stays dim. */
+:root[data-bui-loader="orbit"] [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before {
   background:
     linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-0) * 100%), transparent) 0 0) 0px 0px / 4px 4px no-repeat,
     linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-1) * 100%), transparent) 0 0) 5px 0px / 4px 4px no-repeat,
@@ -373,10 +399,34 @@
 @property --bui-coin-t { syntax: "<number>"; inherits: false; initial-value: 0; }
 @property --bui-coin-color { syntax: "<color>"; inherits: false; initial-value: #fff; }
 @keyframes bui-coin-t { to { --bui-coin-t: 1; } }
-:root[data-bui-loader="coins"][data-bui-coins-ready] [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
+:root[data-bui-loader="coins"][data-bui-coins-ready] [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before {
   --bui-coin-color: var(--bui-ink);
   background: paint(bui-coins);
   animation: bui-coin-t 10.472s linear infinite;
+}
+
+/* The active child thread always shows Orbit (one lit pixel walking the edge), so it
+   reads as work happening elsewhere, distinct from this thread's own pending rows. */
+:root:not([data-bui-loader="bb"]) section[aria-label="Child threads"] > div:first-child > button[aria-label*="active child thread" i]::before {
+  background:
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-0) * 100%), transparent) 0 0) 0px 0px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-1) * 100%), transparent) 0 0) 5px 0px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-2) * 100%), transparent) 0 0) 10px 0px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-7) * 100%), transparent) 0 0) 0px 5px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) 7%, transparent) 0 0) 5px 5px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-3) * 100%), transparent) 0 0) 10px 5px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-6) * 100%), transparent) 0 0) 0px 10px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-5) * 100%), transparent) 0 0) 5px 10px / 4px 4px no-repeat,
+    linear-gradient(color-mix(in oklch, var(--bui-px-on) calc(var(--bui-orb-4) * 100%), transparent) 0 0) 10px 10px / 4px 4px no-repeat;
+  animation:
+    bui-orb-0 950ms ease-in-out 0ms infinite,
+    bui-orb-1 950ms ease-in-out 110ms infinite,
+    bui-orb-2 950ms ease-in-out 220ms infinite,
+    bui-orb-3 950ms ease-in-out 330ms infinite,
+    bui-orb-4 950ms ease-in-out 440ms infinite,
+    bui-orb-5 950ms ease-in-out 550ms infinite,
+    bui-orb-6 950ms ease-in-out 660ms infinite,
+    bui-orb-7 950ms ease-in-out 770ms infinite;
 }
 
 /* ── Shimmer (shimmer): brighter, faster band on pending labels ─────────────── */
@@ -400,10 +450,10 @@
 }
 
 /* ── Streaming caret (streamingCaret): trails the reply while the run is live ── */
-:root:not([data-bui-off~="caret"]) #thread-detail-timeline-panel:has([data-promptbox-submit-action]:is([aria-label="Stop run"], [aria-label^="Steer current run"]))
+:root:not([data-bui-off~="caret"]) #thread-detail-timeline-panel[data-bui-streaming]
   [data-timeline-row-list="top-level"] > [data-timeline-row-id*=":assistant:"]:last-child [data-markdown-preview]
   > :is(p, h1, h2, h3, h4, h5, h6):last-child::after,
-:root:not([data-bui-off~="caret"]) #thread-detail-timeline-panel:has([data-promptbox-submit-action]:is([aria-label="Stop run"], [aria-label^="Steer current run"]))
+:root:not([data-bui-off~="caret"]) #thread-detail-timeline-panel[data-bui-streaming]
   [data-timeline-row-list="top-level"] > [data-timeline-row-id*=":assistant:"]:last-child [data-markdown-preview]
   > :is(ul, ol):last-child > li:last-child::after {
   content: "";
@@ -418,8 +468,7 @@
 }
 
 /* ── Approval cards (approvalCard): permission requests and agent questions ──── */
-:root:not([data-bui-off~="approval"]) section[data-testid="approval-banner"],
-:root:not([data-bui-off~="approval"]) section[data-testid="user-question-banner"] {
+:root:not([data-bui-off~="approval"]) section[data-testid="approval-banner"], :root:not([data-bui-off~="approval"]) section[data-testid="user-question-banner"] {
   border-color: transparent;
   border-radius: var(--bui-radius-card);
   background-color: var(--bui-surface);
@@ -512,28 +561,28 @@
    other, and only the outer corners round. The chrome stays on the banners rather
    than the stack, so anything else in there (a plugin strip) keeps its own space
    instead of becoming an empty row, and nothing is clipped. */
-:root:not([data-bui-off~="banners"]) [data-app-composer] > div.grid:has(> section[aria-label]) {
+:root:not([data-bui-off~="banners"]):not([data-bui-composer="tray"]) [data-app-composer] > div.grid[data-bui-banners] {
   gap: 0;
 }
-:root:not([data-bui-off~="banners"]) [data-app-composer] > div.grid > section[aria-label] {
+:root:not([data-bui-off~="banners"]):not([data-bui-composer="tray"]) [data-app-composer] > div.grid > section[aria-label] {
   border: 1px solid var(--bui-line);
   border-radius: 0;
   background-color: var(--bui-surface);
   box-shadow: none;
 }
-:root:not([data-bui-off~="banners"]) [data-app-composer] > div.grid > section[aria-label]:not(:first-of-type) {
+:root:not([data-bui-off~="banners"]):not([data-bui-composer="tray"]) [data-app-composer] > div.grid > section[aria-label]:not(:first-of-type) {
   margin-top: -1px;
 }
-:root:not([data-bui-off~="banners"]) [data-app-composer] > div.grid > section[aria-label]:first-of-type {
+:root:not([data-bui-off~="banners"]):not([data-bui-composer="tray"]) [data-app-composer] > div.grid > section[aria-label]:first-of-type {
   border-top-left-radius: var(--bui-radius-card);
   border-top-right-radius: var(--bui-radius-card);
 }
-:root:not([data-bui-off~="banners"]) [data-app-composer] > div.grid > section[aria-label]:last-of-type {
+:root:not([data-bui-off~="banners"]):not([data-bui-composer="tray"]) [data-app-composer] > div.grid > section[aria-label]:last-of-type {
   border-bottom-left-radius: var(--bui-radius-card);
   border-bottom-right-radius: var(--bui-radius-card);
 }
 /* Anything that is not a banner keeps the stack's original spacing. */
-:root:not([data-bui-off~="banners"]) [data-app-composer] > div.grid:has(> section[aria-label]) > :not(section[aria-label]):not([data-bb-plugin-root]) {
+:root:not([data-bui-off~="banners"]):not([data-bui-composer="tray"]) [data-app-composer] > div.grid[data-bui-banners] > :not(section[aria-label]):not([data-bb-plugin-root]) {
   margin-block: 8px;
 }
 
@@ -543,23 +592,23 @@
    the trigger swapped for the send button: "Stop run" means a run is live and the
    box is empty. Typing a follow-up flips it to "Steer current run", so the box
    grows back as soon as you type, focused or not; voice input keeps the full box. */
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) {
   overflow: hidden;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-action-row] {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-action-row] {
   inset-block: 0;
   gap: 0;
   padding: 0;
   position: absolute;
   right: .5rem;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-main] {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-main] {
   height: 3rem;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-expanded-only] {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-expanded-only] {
   display: none!important;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-scroll] {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-scroll] {
   padding-top: 0;
   padding-bottom: 0;
   padding-right: 3.5rem;
@@ -568,12 +617,12 @@
   min-height: 3rem!important;
   max-height: 3rem!important;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] {
   align-items: center;
   height: 100%;
   display: flex;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] {
   text-overflow: ellipsis;
   width: 100%;
   max-height: 1.7em;
@@ -581,18 +630,7 @@
   white-space: nowrap!important;
   min-height: 0!important;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable]>*,
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] :where(blockquote,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-li,
-ol,
-p,
-ul) {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable]>*, :root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] :where(blockquote, h1, h2, h3, h4, h5, h6, li, ol, p, ul) {
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
@@ -604,47 +642,43 @@ ul) {
   list-style: none;
   display: inline;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable]>*+:before,
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] :where(blockquote,
-li)>*+:before,
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] :where(ol,
-ul)>li+li:before {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable]>*+:before, :root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] :where(blockquote, li)>*+:before, :root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] :where(ol, ul)>li+li:before {
   content: " ";
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] br {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] br {
   content: " ";
   display: inline;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] br:after {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror[contenteditable] br:after {
   content: " ";
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .prompt-mention-pill>span:last-child {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .prompt-mention-pill>span:last-child {
   min-width: 0;
 }
-:root:not([data-bui-off~="minimize"]) [data-follow-up-composer]:has([data-promptbox-submit-action][aria-label="Stop run"]) [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror p.is-editor-empty:first-child:before {
+:root:not([data-bui-off~="minimize"]) [data-follow-up-composer][data-bui-stop] [data-promptbox]:not([data-promptbox-voice-active]) [data-promptbox-editor-content] .ProseMirror p.is-editor-empty:first-child:before {
   content: var(--promptbox-container-compact-placeholder);
 }
 
 /* ── Tree lines (treeLines): an expanded work group reads as a tree ────────────── */
 /* An expanded group ("Explored 10 files, 1 list") lists its tool calls in
-   [data-timeline-row-list="bundle"]. The list is indented under the header's icon. A 1px trunk runs
+   :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]). The list is indented under the header's icon. A 1px trunk runs
    the full height of every row but the last; each row adds only the rounded curve
    into its icon (centred 12px down), so strokes never stack. Colours are opaque
    (ink mixed into the background) for the same reason: where lines meet, nothing
    darkens. The running row is the current node: its curve and the trunk leading
    down to it from the header are lit. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) {
   --bui-tree-dim: color-mix(in oklch, var(--ink) 22%, var(--background));
   --bui-tree-lit: color-mix(in oklch, var(--ink) 72%, var(--background));
   position: relative;
   margin-left: 7px;
   padding-left: 16px;
 }
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id] {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id] {
   position: relative;
 }
 /* Trunk. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:not(:last-child)::after {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id]:not(:last-child)::after {
   content: "";
   position: absolute;
   top: 0;
@@ -655,11 +689,11 @@ ul)>li+li:before {
   pointer-events: none;
 }
 /* The first row's trunk reaches up to meet the header. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:first-child:not(:last-child)::after {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id]:first-child:not(:last-child)::after {
   top: -4px;
 }
 /* Elbow: just the curve; the trunk supplies the straight part. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]::before {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id]::before {
   content: "";
   position: absolute;
   top: 6px;
@@ -672,26 +706,39 @@ ul)>li+li:before {
   pointer-events: none;
 }
 /* The last row has no trunk, so its elbow carries the straight part itself. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:last-child::before {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id]:last-child::before {
   top: 0;
   height: 12px;
 }
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:first-child:last-child::before {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id]:first-child:last-child::before {
   top: -4px;
   height: 16px;
 }
 /* Current node: the running row's curve, and the path above it, light up. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:has(.animate-shine)::before {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id][data-bui-pending]::before {
   border-color: var(--bui-tree-lit);
 }
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:has(~ [data-timeline-row-id] .animate-shine)::after {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id][data-bui-pending-below]::after {
   background: var(--bui-tree-lit);
 }
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list="bundle"] > [data-timeline-row-id]:has(.animate-shine):not(:last-child)::after {
+:root:not([data-bui-off~="tree"]) :is([data-timeline-row-list="bundle"], [data-timeline-row-list="nested"]) > [data-timeline-row-id][data-bui-pending]:not(:last-child)::after {
   background: linear-gradient(var(--bui-tree-lit) 0 12px, var(--bui-tree-dim) 12px);
 }
+/* A running subagent's steps: BB draws one straight line down its container; the
+   tree replaces it. The container takes a work group's 8px inset so the trunk sits
+   under the header icon, and since these rows are 8px apart each trunk segment
+   reaches down 8px to meet the next. */
+:root:not([data-bui-off~="tree"]) div.isolate.relative[data-bui-nested] {
+  padding-left: 8px;
+}
+:root:not([data-bui-off~="tree"]) div.isolate.relative[data-bui-nested]::before {
+  display: none;
+}
+:root:not([data-bui-off~="tree"]) [data-timeline-row-list="nested"] > [data-timeline-row-id]:not(:last-child)::after {
+  bottom: -8px;
+}
 /* Compact work rows' straight guide line would double up with the tree. */
-:root:not([data-bui-off~="tree"]) [data-timeline-row-list] .group\/timeline-row > .grid > .overflow-hidden > div:has(> [data-timeline-row-list="bundle"]) {
+:root:not([data-bui-off~="tree"]) [data-timeline-row-list] .group\/timeline-row > .grid > .overflow-hidden > div[data-bui-bundle] {
   margin-left: 0;
   padding-left: 8px;
   border-left: 0;
@@ -704,20 +751,20 @@ ul)>li+li:before {
    NEW after its label, at the label's own size. Message rows keep BB's separator.
    NEW sits outside the row's button so a long, truncating label can't clip it; the
    button's own trailing chevron supplies the gap. */
-:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"]:has(+ [data-timeline-row-id] .group\/timeline-row) {
+:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"][data-bui-unread-work] {
   height: 0;
   margin-bottom: -8px;
   overflow: hidden;
 }
-:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"]:has(+ [data-timeline-row-id] .group\/timeline-row) + [data-timeline-row-id] .group\/timeline-row {
+:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"][data-bui-unread-work] + [data-timeline-row-id] .group\/timeline-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 }
-:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"]:has(+ [data-timeline-row-id] .group\/timeline-row) + [data-timeline-row-id] .group\/timeline-row > button {
+:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"][data-bui-unread-work] + [data-timeline-row-id] .group\/timeline-row > button {
   order: 0;
 }
-:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"]:has(+ [data-timeline-row-id] .group\/timeline-row) + [data-timeline-row-id] .group\/timeline-row::after {
+:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"][data-bui-unread-work] + [data-timeline-row-id] .group\/timeline-row::after {
   order: 1;
   content: "NEW";
   color: var(--success);
@@ -727,11 +774,11 @@ ul)>li+li:before {
   line-height: 20px;
 }
 /* Compact work rows off: BB's own 14px label size. */
-:root[data-bui-off~="rows"]:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"]:has(+ [data-timeline-row-id] .group\/timeline-row) + [data-timeline-row-id] .group\/timeline-row::after {
+:root[data-bui-off~="rows"]:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"][data-bui-unread-work] + [data-timeline-row-id] .group\/timeline-row::after {
   font-size: 14px;
 }
 /* Expanded details keep their own line under the label. */
-:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"]:has(+ [data-timeline-row-id] .group\/timeline-row) + [data-timeline-row-id] .group\/timeline-row > .grid {
+:root:not([data-bui-off~="unread"]) [data-timeline-window-key^="divider:"][data-bui-unread-work] + [data-timeline-row-id] .group\/timeline-row > .grid {
   order: 2;
   flex-basis: 100%;
 }
@@ -781,19 +828,672 @@ ul)>li+li:before {
   transition: none;
 }
 
+/* ── Tray composer (composer: tray) ──────────────────────────────────────────────
+   The follow-up prompt component, over BB's own prompt box: a 28px card, 17px input,
+   28px round toolbar controls, one filled button that is voice when empty, send with
+   text and stop while running, and the stack above the card (git, PR, background
+   commands) as a tray fused onto the card's top that rises out of it through a goo
+   filter. Values match the component; its motion springs are sampled into linear():
+     --bui-spring      duration 0.3s, bounce 0    (icon swap, rows)
+     --bui-spring-goo  duration 0.8s, bounce 0.2  (tray, overshoots to 1.015)
+   composer-tray.ts adds the goo filter and marks trays present at mount so they
+   don't animate. A tray can't animate out: BB removes it at once. */
+:root[data-bui-composer="tray"] {
+  --bui-tray: var(--muted);
+  --bui-press: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --bui-spring: linear(0, 0.0231, 0.0796, 0.1546, 0.2381, 0.3232, 0.4058, 0.4832, 0.5541, 0.6177, 0.6742, 0.7236, 0.7666, 0.8036, 0.8353, 0.8623, 0.8852, 0.9045, 0.9207, 0.9343, 0.9457, 0.9552, 0.9631, 0.9696, 0.975, 0.9795, 0.9832, 0.9862, 0.9887, 0.9908, 0.9925, 0.9939, 1);
+  --bui-spring-goo: linear(0, 0.0228, 0.0807, 0.1605, 0.252, 0.3479, 0.4426, 0.5325, 0.615, 0.689, 0.7539, 0.8096, 0.8565, 0.8953, 0.9268, 0.9518, 0.9713, 0.9861, 0.997, 1.0047, 1.0099, 1.013, 1.0147, 1.0152, 1.0149, 1.014, 1.0128, 1.0114, 1.01, 1.0086, 1.0072, 1.0059, 1);
+}
+@keyframes bui-tray-in { from { transform: translateY(100%) scaleX(0.7); filter: blur(8px); } }
+@keyframes bui-tray-goo { from, to { filter: url(#bui-goo); } }
+@keyframes bui-icon-in { from { opacity: 0; transform: scale(0.25); filter: blur(4px); } }
+@keyframes bui-icon-in-voice { from { opacity: 0; transform: scale(0.25); filter: blur(4px); } }
+@keyframes bui-icon-in-stop { from { opacity: 0; transform: scale(0.25); filter: blur(4px); } }
+@keyframes bui-row-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* Card: sits above the tray so the tray's bottom tucks under its rounded top. */
+:root[data-bui-composer="tray"] [data-bui-tray-card] {
+  position: relative;
+  z-index: 1;
+}
+:root[data-bui-composer="tray"] [data-app-composer] form[data-promptbox] {
+  border-color: transparent;
+  border-radius: 28px;
+  background-color: var(--background);
+  box-shadow:
+    0 0 0 1px var(--bui-tray),
+    0 1px 2px -1px rgb(0 0 0 / 0.04),
+    0 12px 32px -14px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.5));
+}
+:root[data-bui-composer="tray"] [data-app-composer] form[data-promptbox]:focus-within {
+  border-color: transparent;
+}
+/* Alignment grid. The card's 28px corner holds 28px round controls, so everything
+   sits on one concentric inset: 14px (outer radius = inner radius + inset). Controls
+   are 14px from the left, right and bottom edges; the text column starts at 18px,
+   where a circle's curved edge reads optically (4px in from its box); the first line
+   sits 13px from the top to balance the 14px under the round buttons. Values are
+   from the card's outer edge; the 1px border is subtracted where padding applies.
+   One line to start, growing with the text up to 200px (or 40% of a short window).
+   BB sets these heights inline (min 68px), hence !important. */
+:root[data-bui-composer="tray"] [data-promptbox] [data-promptbox-editor-scroll] {
+  min-height: 34px !important;
+  max-height: min(212px, 40dvh) !important;
+  padding: 12px 56px 0 17px;
+}
+/* Collapse chevron: centred over the send/voice button and on the first text line. */
+:root[data-bui-composer="tray"] [data-promptbox-input-region] > [data-promptbox-standard-actions] {
+  top: 7px;
+  right: 15px;
+}
+/* Attachments: in the text column, 10px under the text, thumbnails at 66×44 with a
+   10px radius instead of BB's 96×64. */
+:root[data-bui-composer="tray"] [data-promptbox-main] > [data-promptbox-expanded-only] > div {
+  margin: 10px 13px 0 17px;
+}
+:root[data-bui-composer="tray"] [data-promptbox-main] > [data-promptbox-expanded-only] > div > div {
+  margin-bottom: 0;
+}
+:root[data-bui-composer="tray"] [data-promptbox-main] > [data-promptbox-expanded-only] button:has(> img) {
+  display: block;  /* inline, it sat on a text line and left 6px of descender space below */
+  border-radius: 10px;
+}
+:root[data-bui-composer="tray"] [data-promptbox-main] > [data-promptbox-expanded-only] button > img {
+  width: 66px;
+  height: 44px;
+}
+:root[data-bui-composer="tray"] [data-promptbox] .ProseMirror p.is-editor-empty::before {
+  color: color-mix(in oklch, var(--muted-foreground) 65%, transparent);
+}
+
+/* Toolbar: 12px under the text, controls 14px from the card's left, right and
+   bottom edges (13px + the 1px border); 28px controls, the plugin's control size,
+   so they sit with BB's 13px text. BB's own negative margins on the groups are
+   dropped so the inset is exact. */
+:root[data-bui-composer="tray"] [data-promptbox] [data-promptbox-action-row] {
+  padding: 12px 13px 13px;
+}
+:root[data-bui-composer="tray"] [data-promptbox] [data-promptbox-action-row] > *, :root[data-bui-composer="tray"] [data-promptbox] [data-promptbox-action-row] button[aria-label="Prompt actions"] {
+  margin-inline: 0;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] > [data-promptbox-standard-actions]:first-child {
+  gap: 6px;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button:is([aria-label="Prompt actions"], [aria-label^="Provider, model"]) {
+  height: 28px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--bui-line);
+  color: var(--foreground);
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    transform 200ms ease;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Prompt actions"] {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Prompt actions"] svg {
+  width: 16px;
+  height: 16px;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label^="Provider, model"] {
+  min-width: 0;
+  padding-inline: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button:is([aria-label="Prompt actions"], [aria-label^="Provider, model"]):active {
+  transform: scale(0.96);
+}
+@media (hover: hover) and (pointer: fine) {
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] button:is([aria-label="Prompt actions"], [aria-label^="Provider, model"]):hover {
+    background-color: var(--bui-hover);
+    color: var(--foreground);
+  }
+}
+
+/* One button: voice while empty, send with text, stop while running. BB keeps voice
+   and submit as two buttons, so the one not in use is hidden; each icon arrives the
+   way the component's does (scale 0.25 + 4px blur → crisp, 0.3s spring). */
+:root[data-bui-composer="tray"] [data-promptbox]:has([data-promptbox-submit-action]:disabled) [data-promptbox-submit-group] {
+  display: none;
+}
+:root[data-bui-composer="tray"] [data-promptbox]:has([data-promptbox-submit-action]:not(:disabled)) button[aria-label="Start voice input"] {
+  display: none;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label$="voice input"], [data-promptbox-submit-action]), :root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label$="voice input"], [data-promptbox-submit-action]):hover {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  background-color: var(--foreground);
+  color: var(--background);
+  transition:
+    opacity 200ms ease, transform 120ms var(--bui-press);
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label$="voice input"], [data-promptbox-submit-action]):active {
+  transform: scale(0.96);
+}
+/* The component's icons in place of BB's: ArrowUp to send (also when steering a
+   run), AudioLines for voice, a 10px rounded square to stop. Drawn as a mask on
+   ::before over the hidden BB svg; each state gets its own animation name so the
+   icon re-enters with the spring blur swap whenever the state changes. */
+:root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label="Start voice input"], [data-promptbox-submit-action]) svg {
+  display: none;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label="Start voice input"], [data-promptbox-submit-action])::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background-color: currentColor;
+  -webkit-mask: var(--bui-icon) center / contain no-repeat;
+  mask: var(--bui-icon) center / contain no-repeat;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] [data-promptbox-submit-action] {
+  --bui-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 7-7 7 7'/%3E%3Cpath d='M12 19V5'/%3E%3C/svg%3E");
+}
+/* Voice is the quiet state: a hairline circle with a muted icon. The filled circle
+   then only ever means "this sends" or "this stops", so an idle composer next to a
+   thread that's still busy (a background command, say) never looks like a submit. */
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Start voice input"],
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Start voice input"]:hover {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--bui-line);
+  color: var(--muted-foreground);
+}
+@media (hover: hover) and (pointer: fine) {
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Start voice input"]:hover {
+    background-color: var(--bui-hover);
+    color: var(--foreground);
+  }
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Start voice input"] {
+  --bui-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 10v3'/%3E%3Cpath d='M6 6v11'/%3E%3Cpath d='M10 3v18'/%3E%3Cpath d='M14 8v7'/%3E%3Cpath d='M18 5v13'/%3E%3Cpath d='M22 10v3'/%3E%3C/svg%3E");
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] [data-promptbox-submit-action]::before {
+  animation: bui-icon-in 300ms var(--bui-spring) both;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] button[aria-label="Start voice input"]::before {
+  animation: bui-icon-in-voice 300ms var(--bui-spring) both;
+}
+:root[data-bui-composer="tray"] [data-promptbox-action-row] [data-promptbox-submit-action][aria-label="Stop run"]::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  -webkit-mask: none;
+  mask: none;
+  animation-name: bui-icon-in-stop;
+}
+
+/* Tray: the stack above the card, 16px in from its sides, 24px top corners, its
+   bottom 20px tucked under the card. Only while it holds something. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items] {
+  position: relative;
+  z-index: 0;
+  gap: 2px;
+  margin: 0 16px -20px;
+  padding: 6px 12px 26px;  /* 6px visible above the first row and below the last */
+  border-radius: 24px 24px 0 0;
+  background-color: var(--bui-tray);
+}
+/* Concave fillets flaring the tray into the card's rounded top: an r=20 circle
+   tangent to the tray side (16px inset) and the 28px card corner. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]::before, :root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]::after {
+  content: "";
+  position: absolute;
+  bottom: 7.8px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--bui-tray);
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]::before {
+  right: 100%;
+  clip-path: path("M20 0 A20 20 0 0 1 13.33 14.91 L20 20 Z");
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]::after {
+  left: 100%;
+  clip-path: path("M0 0 A20 20 0 0 0 6.67 14.91 L0 20 Z");
+}
+/* Rising out of the card: y 100% → 0, scaleX 0.7 → 1, blur 8px → 0 on the 0.8s
+   bounce-0.2 spring, while the goo filter fuses the two shapes. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]:not([data-bui-tray-initial]) {
+    animation: bui-tray-in 800ms var(--bui-spring-goo) both;
+  }
+  /* :has() can't nest, so match the stack through its section child instead. */
+  :root[data-bui-composer="tray"] [data-app-composer]:has(> div.grid:not([data-bui-tray-initial]) section) {
+    animation: bui-tray-goo 800ms linear;
+  }
+}
+
+
+/* Tray items flatten into rows: the component's stats header (14px medium, muted,
+   32px) and queue rows (13.5px, 8px apart), with no card of their own. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items] > section,
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section {
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+/* While a question or approval is pending BB hides the prompt box, so the tray has
+   no card to tuck under. It becomes the card itself: full width, the prompt card's
+   28px radius, background, ring and shadow, even padding, and no fillets or
+   tuck-under band. */
+:root[data-bui-composer="tray"] [data-app-composer]:has([data-follow-up-composer][hidden]) > div.grid[data-bui-tray-items] {
+  margin: 0;
+  padding: 6px;
+  border-radius: 28px;
+  background-color: var(--background);
+  box-shadow:
+    0 0 0 1px var(--bui-tray),
+    0 1px 2px -1px rgb(0 0 0 / 0.04),
+    0 12px 32px -14px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.5));
+}
+:root[data-bui-composer="tray"] [data-app-composer]:has([data-follow-up-composer][hidden]) > div.grid::before,
+:root[data-bui-composer="tray"] [data-app-composer]:has([data-follow-up-composer][hidden]) > div.grid::after {
+  display: none;
+}
+/* Every item sits on the tray's own spacing, so BB's per-card margins go. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section {
+  margin: 0;
+}
+
+/* BB groups some cards (child threads + context) in a wrapper with 8px spacing;
+   it dissolves into the tray's list so every row shares the same 2px rhythm. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > div:has(> section) {
+  display: contents;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section {
+  margin: 0;
+}
+
+/* One list, whatever the card: context (parent thread, changed files), background
+   commands / agents / activity, workflow. Every row is 28px with its first icon on
+   the same 18px column (12px tray inset + 6px button inset), 12.5px text, 14px icons,
+   2px between rows. A row's details panel keeps BB's open/close, but while closed it
+   drops its hairline and leftover height, so each extra item adds no dead space. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section > div:first-child, :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section > div:first-child {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  gap: 4px;
+  padding: 0;
+  overflow: hidden;
+}
+/* Items are links/buttons (context) or a div BB draws as its own mini-card with a
+   ring and 70% background (background commands); all flatten onto the tray. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section > div:first-child > :is(a, button, div), /* Items are links/buttons (context) or a div BB draws as its own mini-card with a
+   ring and 70% background (background commands); all flatten onto the tray. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section > div:first-child > :is(a, button, div) {
+  min-width: 0;
+  min-height: 28px;
+  padding-block: 0;
+  padding-inline: 6px;
+  border-radius: 8px;
+  background-color: transparent;
+  box-shadow: none;
+  font-size: 12.5px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section > div:first-child > :is(a, button, div) > :is(svg, span:has(> svg):first-child), :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section > div:first-child > :is(a, button, div) > :is(svg, span:has(> svg):first-child) {
+  width: 14px;
+  height: 14px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section > div:first-child > :is(a, button, div) *, :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section > div:first-child > :is(a, button, div) * {
+  font-size: inherit;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section section[class*="grid-rows-[0fr]"], :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section section[class*="grid-rows-[0fr]"] {
+  border-top-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section section:not([class*="grid-rows-[0fr]"]) > div, :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section section:not([class*="grid-rows-[0fr]"]) > div {
+  margin-bottom: 4px;
+  border-radius: 12px;
+  background-color: var(--background);
+}
+
+/* Queue: BB draws it as its own drawer (raised card, hairlines, a centred drag bar,
+   a dark action pill). In the tray it becomes one more group: a quiet label on the
+   icon column, then 28px rows whose icon and text share every tray row's columns. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] {
+  margin: 0;
+  padding-bottom: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  interpolate-size: allow-keywords;
+}
+/* BB sizes the drawer from its own row metrics (33px rows, 55px of chrome), which
+   leaves dead space under these tighter rows. At rest it fits its content instead,
+   up to BB's 174px cap; while dragged (BB drops its transition class) or in the
+   workspace, BB's inline height applies. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"][class*="transition-[height"]:has(> header[data-queued-messages-mode="drawer"]) {
+  height: auto !important;
+  max-height: 174px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"][class*="transition-[height"]:has(> header[data-queued-messages-mode="collapsed"]) {
+  height: 28px !important;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] > header {
+  height: 28px;
+  gap: 4px;
+  padding: 0 0 0 6px;
+  border-bottom: 0;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] > header > div:first-child {
+  min-width: 0;
+  gap: 6px;
+  padding-left: 0;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] > header > div:first-child > span:first-child {
+  color: var(--muted-foreground);
+}
+/* The drag bar (drag up to open the queue workspace) keeps its whole-header hit
+   area but only shows while the header is hovered or focused. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] > header > button[aria-label^="Drag up"] > span {
+  opacity: 0;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] > header:is(:hover, :focus-within) > button[aria-label^="Drag up"] > span {
+  opacity: 0.4;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-block: 0;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] {
+  --bui-queue-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 17a2 2 0 0 1-2 2H6.83a2 2 0 0 0-1.41.59l-2.2 2.2A.71.71 0 0 1 2 21.29V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z'/%3E%3C/svg%3E");
+  padding: 0;
+  border-bottom: 0;
+  border-radius: 8px;
+  transition: background-color 150ms ease;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:is(:hover, :focus-within) {
+  background-color: var(--state-hover);
+  transition-duration: 0ms;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] > div {
+  align-items: flex-start;
+  gap: 6px;
+  padding-inline: 6px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] > div > div:nth-child(2) {
+  padding-block: 6px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [title] > span {
+  font-size: 12.5px !important;
+  line-height: 16px !important;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [title] {
+  color: var(--muted-foreground);
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:is(:hover, :focus-within) [title] {
+  color: var(--foreground);
+}
+/* Icon column: the message's state (retry, failed, scheduled) or a message glyph,
+   centred on the first line. The reorder grip takes its place on hover when there
+   is more than one message to reorder. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:has([data-queued-message-metadata] svg[data-icon="RotateCcw"]) {
+  --bui-queue-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/svg%3E");
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:has([data-queued-message-metadata] svg[data-icon="TimeSchedule"]) {
+  --bui-queue-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E");
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:has([data-queued-message-metadata] svg[data-icon="AlertCircle"]) {
+  --bui-queue-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v4'/%3E%3Cpath d='M12 16h.01'/%3E%3C/svg%3E");
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:has([data-queued-message-metadata] svg[data-icon="AlertCircle"]) button[aria-label^="Reorder"] {
+  color: var(--destructive);
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-metadata] svg:is([data-icon="RotateCcw"], [data-icon="TimeSchedule"], [data-icon="AlertCircle"]) {
+  display: none;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] button[aria-label^="Reorder"] {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  margin: 7px 0 0;
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--muted-foreground);
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] button[aria-label^="Reorder"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  -webkit-mask: var(--bui-queue-icon) center / 14px no-repeat;
+  mask: var(--bui-queue-icon) center / 14px no-repeat;
+  transition: opacity 150ms ease;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] button[aria-label^="Reorder"] > svg {
+  position: absolute;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:is(:hover, :focus-within) button[aria-label^="Reorder"]:not(:disabled)::before {
+  opacity: 0;
+}
+/* Attachments: a paperclip and the count, in place of BB's file-attachment glyph. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-attachment] {
+  gap: 2px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-attachment] > svg {
+  width: 12px;
+  height: 12px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 6-8.41 8.59a2 2 0 0 0 2.83 2.83l8.49-8.48a4 4 0 0 0-5.66-5.66l-8.49 8.49a6 6 0 0 0 8.49 8.49l8.48-8.49'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 6-8.41 8.59a2 2 0 0 0 2.83 2.83l8.49-8.48a4 4 0 0 0-5.66-5.66l-8.49 8.49a6 6 0 0 0 8.49 8.49l8.48-8.49'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-attachment] > svg > * {
+  display: none;
+}
+/* Actions sit on the hovered row, level with its first line: no pill, no fade. BB
+   leaves them in the row's flow (its classes set both relative and absolute), which
+   reserves blank space at rest; out of flow, the text uses the full row and only
+   makes room for them on hover. Tailwind's translate variable is zeroed because the
+   minifier folds a plain `translate: none` into `transform`. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-actions] {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  gap: 2px;
+  background-color: transparent;
+  --tw-translate-y: 0px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-actions]::before {
+  display: none;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-actions] button {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 6px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row] [data-queued-message-actions] button svg {
+  width: 14px;
+  height: 14px;
+}
+@media (hover: hover) {
+  :root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Queued messages"] [data-queued-message-row]:is(:hover, :focus-within) > div > div:nth-child(2) {
+    padding-right: 80px;
+  }
+}
+
+/* An expandable row alone on its line (changed files, child threads) spans the tray
+   so its chevron lines up on the right edge with the others. When it shares the line
+   (changed files beside the merge-base picker) it keeps its chevron by its label. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section > div:first-child > button[aria-controls]:only-child, :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section > div:first-child > button[aria-controls]:only-child {
+  flex: 1;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section > div:first-child > button[aria-controls]:only-child > svg[data-icon="ChevronDown"], :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section > div:first-child > button[aria-controls]:only-child > svg[data-icon="ChevronDown"] {
+  margin-left: auto;
+}
+
+/* Background commands read like every other row: regular weight, muted. A single
+   running command shows its first line in monospace, so a heredoc's body never
+   spills into the row; the full command stays in its tooltip. */
+:root[data-bui-composer="tray"] [data-app-composer] section[aria-label="Background commands"] #thread-background-commands-card-toggle > span {
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+:root[data-bui-composer="tray"] [data-app-composer] section[aria-label="Background commands"] [aria-label^="Background command:"] span.truncate {
+  height: 16px;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 11.5px !important;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: pre;
+}
+
+/* Groups (commands, context, queue) sit 6px apart; rows within a group stay 2px.
+   The tray's top padding gives up the same 4px, so the first group stays 6px in. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section, :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section {
+  margin-top: 4px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items], :root[data-bui-composer="tray"] [data-app-composer]:has([data-follow-up-composer][hidden]) > div.grid[data-bui-tray-items] {
+  padding-top: 2px;
+}
+
+/* Changed files: a static label pinned to the tray's top-right corner instead of a
+   row of its own, so whatever is running keeps the left side. Fixed width, counts
+   right-aligned with 8px of air on the left; "1 file +25 -0" in place of BB's
+   "Uncommitted · 1 file · +25 -0" (composer-tray.ts supplies the file count). It
+   opens nothing: no pointer, no chevron, no details panel. Worktrees' merge-base
+   picker beside it is hidden. The context card it sat in dissolves when the summary
+   is all it held (composer-tray.ts marks it); rows clear the label on the right. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]:has(#thread-prompt-banner-git-toggle) {
+  --bui-git-w: 148px;
+  min-height: 60px;  /* the label alone: 6px + a 28px row + the 26px tuck-under band */
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]:has(#thread-prompt-banner-git-toggle) > section > div:first-child,
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]:has(#thread-prompt-banner-git-toggle) > div > section > div:first-child {
+  padding-right: calc(var(--bui-git-w) + 4px);
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid section[data-bui-git-alone],
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid section[data-bui-git-alone] > div:first-child {
+  display: contents;
+}
+:root[data-bui-composer="tray"] [data-app-composer] section[aria-label="Thread context before sending"] > div:first-child > div:has(> svg[data-icon="GitMerge"]),
+:root[data-bui-composer="tray"] [data-app-composer] #thread-prompt-banner-git-body,
+:root[data-bui-composer="tray"] [data-app-composer] #thread-prompt-banner-git-toggle > svg:last-child {
+  display: none;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid #thread-prompt-banner-git-toggle {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  width: var(--bui-git-w);
+  justify-content: flex-end;
+  gap: 6px;
+  padding-inline: 8px 6px;
+  pointer-events: none;
+  color: var(--muted-foreground);
+}
+:root[data-bui-composer="tray"] [data-app-composer]:has([data-follow-up-composer][hidden]) > div.grid #thread-prompt-banner-git-toggle {
+  right: 6px;  /* the tray as the card: 6px padding all round */
+}
+:root[data-bui-composer="tray"] [data-app-composer] #thread-prompt-banner-git-toggle > span {
+  display: flex;
+  flex: none;
+  align-items: center;  /* centred, not on the 0px text's baseline */
+  font-size: 0 !important;  /* BB's words and separators; the counts come back below */
+}
+:root[data-bui-composer="tray"] [data-app-composer] #thread-prompt-banner-git-toggle > span::before {
+  content: attr(data-bui-files);
+  margin-right: 6px;  /* not gap: BB's hidden text runs are flex items too */
+  font-size: 12.5px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] #thread-prompt-banner-git-toggle > span > span {
+  font-size: 12.5px !important;
+}
+
+/* The summary alone: no empty left side. The label spans the row like any other,
+   icon and BB's state word on the row's icon column, counts still on the right. */
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-git-only] #thread-prompt-banner-git-toggle {
+  left: 12px;
+  width: auto;
+  padding-inline: 6px;
+}
+:root[data-bui-composer="tray"] [data-app-composer]:has([data-follow-up-composer][hidden]) > div.grid[data-bui-git-only] #thread-prompt-banner-git-toggle {
+  left: 6px;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-git-only] #thread-prompt-banner-git-toggle > svg:first-child {
+  order: -1;
+}
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-git-only] #thread-prompt-banner-git-toggle::before {
+  content: attr(data-bui-git-state);
+  margin-right: auto;
+  font-size: 12.5px;
+}
+
+/* Responsive. Touch: 36px controls so every button has a real hit area, with
+   icons and the stop square scaled to match. Short windows: tighter padding so the
+   composer never takes over the screen. */
+@media (pointer: coarse) {
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] button:is([aria-label="Prompt actions"], [aria-label^="Provider, model"]), :root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label$="voice input"], [data-promptbox-submit-action]) {
+    height: 36px;
+  }
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label="Prompt actions"], button[aria-label$="voice input"], [data-promptbox-submit-action]) {
+    width: 36px;
+    min-width: 36px;
+  }
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label="Start voice input"], [data-promptbox-submit-action])::before {
+    width: 16px;
+    height: 16px;
+  }
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] [data-promptbox-submit-action][aria-label="Stop run"]::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+:root[data-bui-composer="tray"] [data-app-composer] > div.grid > section[aria-label="Thread context before sending"] > div:first-child > :is(a, button), :root[data-bui-composer="tray"] [data-app-composer] > div.grid > div > section[aria-label="Thread context before sending"] > div:first-child > :is(a, button) {
+    min-height: 36px;
+  }
+}
+@media (max-height: 640px) {
+  :root[data-bui-composer="tray"] [data-promptbox] [data-promptbox-editor-scroll] {
+    min-height: 32px !important;
+    padding-top: 10px;
+  }
+  :root[data-bui-composer="tray"] [data-promptbox] [data-promptbox-action-row] {
+    padding-block: 8px 10px;
+  }
+}
+
+/* A row that joins a tray already showing rises 6px on the 0.3s spring. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-bui-composer="tray"] [data-app-composer] > div.grid:not([data-bui-tray-initial]) > section + section {
+    animation: bui-row-in 300ms var(--bui-spring) both;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  [data-promptbox] [data-promptbox-submit-action]:not(:disabled):active,
-  [data-promptbox-action-row] button:not([data-promptbox-submit-action]):active,
-  [data-radix-popper-content-wrapper] > [role="dialog"]:has(> div > button > svg[data-icon="MessageSquarePlus"]) button:active,
-  section[data-testid$="-banner"] button.inline-flex.whitespace-nowrap:not(:disabled):active,
-  [data-timeline-row-list] [data-markdown-preview] div:has(> pre.bb-code-highlight) > div:first-child button:active {
+  :root[data-bui-composer="tray"] [data-app-composer] > div.grid[data-bui-tray-items]:not([data-bui-tray-initial]) {
+    animation: bui-fade-in 150ms ease both;
+  }
+  :root[data-bui-composer="tray"] [data-promptbox-action-row] :is(button[aria-label="Start voice input"], [data-promptbox-submit-action])::before {
+    animation: bui-fade-in 120ms ease both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-promptbox] [data-promptbox-submit-action]:not(:disabled):active, [data-promptbox-action-row] button:not([data-promptbox-submit-action]):active, [data-radix-popper-content-wrapper] > [role="dialog"]:has(> div > button > svg[data-icon="MessageSquarePlus"]) button:active, section[data-testid$="-banner"] button.inline-flex.whitespace-nowrap:not(:disabled):active, [data-timeline-row-list] [data-markdown-preview] div[data-bui-code] > div:first-child button:active {
     transform: none;
   }
-  [data-timeline-row-list] .group\/timeline-row > button > span > span:has(> span > .animate-shine:first-child)::before {
+  [data-timeline-row-list] .group\/timeline-row > button > span > span[data-bui-pending]::before {
     animation: none !important;
   }
-  section[data-testid="approval-banner"],
-  section[data-testid="user-question-banner"] {
+  section[data-testid="approval-banner"], section[data-testid="user-question-banner"] {
     animation-name: bui-fade-in;
   }
   .bui-spatial-tip,
@@ -801,4 +1501,90 @@ ul)>li+li:before {
     transform: translate3d(var(--x, 0), var(--y, 0), 0);
     transition: opacity 120ms ease;
   }
+}
+
+/* Changed-files list (changed-files.tsx), under the latest turn's last response: a
+   hairline card with a summary header, then one 28px row per file (name, its folder
+   muted, +/− counts), most-changed first. Three rows at rest; expanded, the list
+   scrolls past 240px so a big turn never pushes the conversation away. */
+.bui-turn {
+  margin-top: 12px;
+  padding: 4px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--bui-line);
+  color: var(--muted-foreground);
+  font-size: 12.5px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.bui-turn-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding-inline: 8px;
+}
+.bui-turn-files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bui-turn-files[data-open] {
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.bui-turn-file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: 8px;
+  color: var(--foreground);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 150ms ease;
+}
+.bui-turn-file:hover,
+.bui-turn-file:focus-visible {
+  background-color: var(--bui-hover);
+  transition-duration: 0ms;
+}
+.bui-turn-path {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.bui-turn-name,
+.bui-turn-dir {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bui-turn-name {
+  flex: 0 1 auto;
+}
+.bui-turn-dir {
+  flex: 1 1 0;
+  color: var(--bui-ink-3);
+  font-size: 12px;
+}
+.bui-turn-more {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: 8px;
+  color: var(--muted-foreground);
+  transition: color 150ms ease;
+}
+.bui-turn-more:hover {
+  color: var(--foreground);
+}
+.bui-turn-more[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }

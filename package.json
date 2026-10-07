@@ -15,7 +15,9 @@
     "server": "./server.ts",
     "app": "./app.tsx"
   },
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
   "devDependencies": {
     "@get-bb/plugin-sdk": "0.4.87",
     "@types/better-sqlite3": "^7.6.12",
@@ -24,8 +26,7 @@
     "@types/react-dom": "^19.0.0",
     "better-sqlite3": "^12.0.0",
     "hono": "^4.11.9",
-    "typescript": "^5.7.0",
-    "zod": "^4.3.6"
+    "typescript": "^5.7.0"
   },
   "description": "Restyles BB's chat \u2014 composer, messages, work rows, loading states \u2014 in BeautifulUI's design language, using your active theme's colors.",
   "scripts": {

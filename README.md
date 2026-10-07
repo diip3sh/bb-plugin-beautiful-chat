@@ -51,6 +51,7 @@ in `server.ts`.
 | --- | --- | --- | --- |
 | `loader` | Loading animation | `drive` (default), `dots`, `orbit`, `coins`, `bb` | The icon on a pending work row. `drive`: a 3×3 pixel grid sweeping; `dots`: the same grid as round pixels; `orbit`: pixels circling the edge; `coins`: a ring of tumbling coins painted by a CSS Paint Worklet; `bb`: leaves BB's own icon alone. |
 | `toolChips` | Tool call rows | `surface` (default), `outline`, `plain` | How an individual tool call row is drawn. `surface`: filled chip with a hairline; `outline`: hairline only; `plain`: no background or border. |
+| `composer` | Composer style | `default` (default), `tray` | `tray`: a 28px follow-up card with 36px round controls, one filled button that is voice when empty, send with text and stop while running, and the PR, changed-files and background-command items in a tray fused onto the card's top. The tray rises out of the card through a goo filter when it appears mid-thread; it doesn't animate out, because BB removes it at once. |
 | `shimmer` | Label shimmer | on/off | A brighter, faster shimmer band on pending labels such as "Thinking…" and "Running". Only applies under `prefers-reduced-motion: no-preference`. |
 | `workRows` | Compact work rows | on/off | Pill-shaped row headers, 12.5px text, monospace durations, a guide line under expanded details, smoother expand. |
 | `streamingCaret` | Streaming caret | on/off | A caret at the end of the reply while a run is live and the reply is the latest row. |
@@ -61,6 +62,7 @@ in `server.ts`.
 | `selectionPill` | Selection pill | on/off | Pill style for the "Add to chat / Reply in side chat" popover on selected text. |
 | `treeLines` | Tree lines | on/off | Rows inside an expanded work group are indented under its header and joined by a trunk with rounded elbows into each row's icon. |
 | `minimizeWhileRunning` | Minimize prompt while generating | on/off | While a run is live and the prompt box is empty, the box collapses to BB's one-line compact layout; typing a follow-up grows it back. |
+| `turnChanges` | Changed files list | on/off | Under the latest response, the files its turn edited with line counts, most-changed first: three at first, the rest on expand in a list that scrolls past a max height. Click one to open it. |
 | `mergedBanners` | Merged banner stack | on/off | The cards above the composer (background commands, git, parent and child threads) are grouped into one card with hairline dividers instead of stacking separately. |
 | `unreadMarker` | Unread marker | on/off | The first unread work row prints `NEW` after its own label in the success color, instead of BB's separator and rule above it. Message rows keep BB's separator. |
 | `messageActions` | Message actions | on/off | Hover chips on message action buttons, and spatial tooltips: in a row of 3+ tooltip buttons one shared bubble glides and resizes between siblings. Turning this off also unmounts the spatial tooltip script. |
@@ -92,12 +94,13 @@ bb plugin reload beautiful-chat
 ## Tests
 
 ```sh
-node --experimental-strip-types --test app-css.test.ts settings.test.ts spatial-tooltip.test.ts
+node --experimental-strip-types --test *.test.ts
 ```
 
-Seven tests: the composer CSS source and bundled output preserve BB's native footer,
-`rootAttributes()` validates setting values and fallbacks, and `placeTip()` covers
-edge-flipping and viewport clamping. The CSS tests are static guards; visual
+Eleven tests: the composer CSS source and bundled output preserve BB's native footer,
+`rootAttributes()` validates setting values and fallbacks, `placeTip()` covers
+edge-flipping and viewport clamping, and the changed-files helpers count diff lines,
+key changes by workspace path and order files most-changed first. The CSS tests are static guards; visual
 behavior also needs browser verification against BB's current markup.
 
 ## Limitations
